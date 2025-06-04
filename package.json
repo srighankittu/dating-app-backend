@@ -1,0 +1,21 @@
+{
+  "name": "dating-app-backend",
+  "version": "1.0.0",
+  "description": "Dating app baxkend",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "dating",
+    "backend"
+  ],
+  "author": "Srighan Vedere",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

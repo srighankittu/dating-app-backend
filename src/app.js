@@ -57,14 +57,25 @@ app.get("/feed", async (req, res) => {
 });
 
 //update user data
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userID", async (req, res) => {
   try {
-    const id = req.body.userID;
+    // const id = req.body.userID; Can be ferched from the params and not from body
+    const id = req.params.userID;
     const data = req.body;
-    await User.findOneAndUpdate({ _id: id }, data);
+    const ALLOWED_UPDATES = ["photoUrl", "about", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((item) => {
+      return ALLOWED_UPDATES.includes(item);
+    });
+    if (!isUpdateAllowed) throw new Error("You cannot update these detail(s)");
+    if (data.skills.length > 10)
+      throw new Error("You cannot add more than 10 skills dude, wtf?");
+    await User.findOneAndUpdate({ _id: id }, data, {
+      returnDocument: "before", // Will return document before update, "after" will return new document after update
+      runValidators: true, // will do the validation checks even on patch calls. By default they apply only on new documents
+    });
     res.send("Data Updated Successfully!");
   } catch (err) {
-    res.status(500).send("User Data Cannot be updated");
+    res.status(500).send("User Data Cannot be updated" + err);
   }
 });
 

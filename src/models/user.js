@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,10 +17,20 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(val) {
+        if (!validator.isEmail(val)) {
+          throw new Error("Invalid Email address!");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      validate(val) {
+        if (!validator.isStrongPassword(val)) {
+          throw new Error("Very weak password dude ");
+        }
+      },
     },
     age: {
       type: Number,
@@ -37,6 +48,11 @@ const userSchema = new mongoose.Schema(
     photoUrl: {
       type: String,
       default: "https://pngmaker.io/tag/Dog-Photos",
+      validate(val) {
+        if (!validator.isURL(val)) {
+          throw new Error("Invalid Image URL dude!");
+        }
+      },
     },
     about: {
       type: String,

@@ -3,14 +3,12 @@ const { User } = require("../models/user");
 const userAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    console.log(token);
     if (!token) {
       throw new Error("Invalid Token");
     }
     const decode = await jwt.verify(token, "SECRET_KEY");
     const { _id } = decode;
     const user = await User.findOne({ _id });
-    console.log(user);
     if (!user) throw new Error("Not a valid user");
     req.user = user;
     next();

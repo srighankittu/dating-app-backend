@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
       trim: true,
       validate(val) {
@@ -76,6 +75,7 @@ userSchema.methods.getJWT = async function () {
 
   return token;
 };
+userSchema.index({ email: 1 }, { unique: true });
 
 const User = mongoose.model("User", userSchema);
 

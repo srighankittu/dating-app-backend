@@ -25,7 +25,6 @@ requestsRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
         { fromUserID: toUserID, toUserID: fromUserID },
       ],
     });
-
     if (existingConnectionRequest) {
       return res.status(400).json({
         message: "Connection Request already Exists",
@@ -48,10 +47,43 @@ requestsRouter.post("/send/:status/:toUserId", userAuth, async (req, res) => {
   }
 });
 
+requestsRouter.post(
+  "/review/:status/:requestID",
+  userAuth,
+  async (req, res) => {
+    try {
+      const { _id } = req.user;
+      const { status, requestID } = req.params;
+      //existing status should be interested only
+      //accepted statuses
+      const acceptedStatus = ["accepted", "rejected"];
+      if (!acceptedStatus.includes(status)) {
+        throw new Error("Invalid Status");
+      }
+
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestID,
+        toUserID: _id,
+        status: "interested",
+      });
+      if (!connectionRequest) throw new Error("Invalid Request");
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+      res.json({
+        message: `Connection Request is ${status}`,
+        data: data,
+      });
+    } catch (err) {
+      res.status(400).send("Some issue" + err);
+    }
+  }
+);
+
 requestsRouter.get("/getRequests", userAuth, async (req, res) => {
   try {
     const userID = req.user._id;
-    const requests = await ConnectionRequest.find({ fromUserID: userID });
+    const requests = await ConnectionRequest.find({});
     res.status(200).send(requests);
   } catch {
     throw new Error("Unable to fetch requests");

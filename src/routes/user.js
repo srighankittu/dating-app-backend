@@ -54,6 +54,9 @@ userRouter.get("/connections", userAuth, async (req, res) => {
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const { _id } = req.user;
+    const page = parseInt(req.query.page) || 10;
+    const limit = parseInt(req.query.limit) || 2;
+    const skip = (page - 1) * limit;
     // console.log(loggedInUser);
     //Get all users who have interacted with loggedIn user
     const connectedUsers = await ConnectionRequest.find({
@@ -69,7 +72,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     const users = await User.find({
       _id: { $nin: Array.from(hideUsersFeed), $ne: _id }, //$ne should be there because if a new user logs in with no interactions
       // then they will not be excluded in above logic so need to exclude here!
-    }).select("firstName lastName");
+    })
+      .select("firstName lastName")
+      .skip(skip)
+      .limit(limit);
     res.json({
       message: "Done!",
       data: users,

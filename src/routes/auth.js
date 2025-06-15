@@ -42,12 +42,19 @@ authRouter.post("/login", async (req, res) => {
       // Add token to cookie
       res.cookie("token", token);
       // Send it back to user
-      res.send("Good boi!");
+      res.json({
+        message: "Logged in Successfully",
+        data: user,
+      });
     } else {
-      throw new Error("You forgot your password dweeb!");
+      res.status(400).json({
+        message: "You forgot your password dweeb!",
+      });
     }
   } catch (err) {
-    res.status(400).send("LOL " + err.message);
+    res.status(400).json({
+      message: "LOL " + err.message,
+    });
   }
 });
 
